@@ -1,0 +1,32 @@
+Data for Washington:
+Temperature:
++---------+----------+-------+--------+
+| January | February | March | August |
++---------+----------+-------+--------+
+| 2.3     | 3.9      | 8.3   | 25.7   |
++---------+----------+-------+--------+
+Minimum occurs in January: 2.3
+Maximum occurs in August: 25.7
+Average value: 10.05
+--------------------------------------------------
+Rainfall:
++---------+----------+-------+--------+
+| January | February | March | August |
++---------+----------+-------+--------+
+| 71.1    | 65.5     | 88.4  | 74.2   |
++---------+----------+-------+--------+
+Minimum occurs in February: 65.5
+Maximum occurs in March: 88.4
+Average value: 74.80
+--------------------------------------------------
+Sunshine hours:
++---------+----------+-------+--------+
+| January | February | March | August |
++---------+----------+-------+--------+
+| 145.7   | 152.6    | 204.6 | 263.5  |
++---------+----------+-------+--------+
+Minimum occurs in January: 145.7
+Maximum occurs in August: 263.5
+Average value: 191.60
+--------------------------------------------------
+
