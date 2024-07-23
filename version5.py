@@ -4,15 +4,13 @@ import os.path
 from os import path
 import matplotlib.pyplot as plt 
 
-def read_data():
+def read_data(label):
     months = ['January', 'February', 'March', 'April', 'May', 'June',
               'July', 'August', 'September', 'October', 'November', 'December']
     
-    temp_data = pd.read_csv('./resources/temperature.csv', index_col=0, names=months)
-    rainfall_data = pd.read_csv('./resources/rainfall.csv', index_col=0, names=months)
-    sunshine_data = pd.read_csv('./resources/sunshine.csv', index_col=0, names=months)
+    data = pd.read_csv(f'./resources/{label}.csv', index_col=0, names=months)
 
-    return temp_data, rainfall_data, sunshine_data
+    return data
 
 def plot_data(cities, data_map, months_chosen):
     num_data_types = len(data_map)
@@ -85,6 +83,36 @@ def convert_month(month):
         case _:
             return month.capitalize()
 
+def save_results(results):
+    while True:
+        save_choice = input("Do you want to save these results in a file (enter 'yes' or 'no')? ").lower().strip() 
+        if save_choice in ['yes', 'no']:
+            if save_choice == 'yes':
+                file_path = input("Enter the file path: ").strip()
+                real_path = f'./storage/{file_path}'
+                if path.exists(real_path):
+                    while True:
+                        update_choice = input("This file exists. Do you want to update this file (enter 'yes' or 'no')? ").lower().strip()
+                        if update_choice in ['yes', 'no']:
+                            if update_choice == 'yes':
+                                with open(real_path, 'a') as file:
+                                    file.write(results)
+                                    print("File updated successfully.")
+                            else:
+                                with open(real_path, 'w') as file:
+                                    file.write(results)
+                                    print("File overwritten successfully.")
+                                    break
+                        else:
+                            print("Invalid choice. Please enter 'yes' or 'no'.")
+                else:
+                    with open(real_path, 'w') as file:
+                        file.write(results)
+                        print("File created successfully.")
+            break
+        else:
+            print("Invalid choice. Please enter 'yes' or 'no'.") 
+
 def sort_months(months):
     month_order = {
         'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6,
@@ -92,16 +120,69 @@ def sort_months(months):
     }
     return sorted(months, key=lambda x: month_order[x])
 
+def vaildate_input(data_chosen, label):
+    match label:
+        case 'city':
+            temp_data = read_data('temperature')
+            valid_cities = temp_data.index.str.lower().tolist()
+
+            cities_display = []
+            for city in data_chosen.split():
+                if city not in valid_cities:
+                    print(f"{city} is not a legal value (ignored)")
+                else:
+                    cities_display.append(city)
+
+            return cities_display
+        case 'data_type':
+            data_types = ['temp', 'rain', 'sun']
+            data_display = []
+            if data_chosen == 'all' or 'all' in data_chosen:
+                data_display = data_types
+            else:
+                for dt in data_chosen.split():
+                    if dt not in data_types:
+                        print(f"{dt} is not a legal value (ignored)")
+                    else:
+                        data_display.append(dt)
+
+            return data_display
+        case 'months':
+            months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
+                'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+            months_full = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December']
+            months_display = []
+            if data_chosen == 'all' or 'all' in data_chosen:
+                months_display = months_full
+            else:
+                for month in data_chosen.split():
+                    if month not in months and month.capitalize() not in months_full:
+                        print(f"{month} is not a legal value (ignored)")
+                    else:
+                        if len(month) == 3:
+                            month = convert_month(month)
+                        months_display.append(month)
+            months_display = sort_months(months_display)
+            
+            return months_display
+
 def main():
     while True:
         print("Welcome to CLIP, the CLImate Plotter")
-        print("loading the data...", end="\n")
+        print("loading the data... done!", end="\n")
 
-        temp_data, rainfall_data, sunshine_data = read_data()
+        cities_chosen = input("choose the cities: ").lower().strip()
+        data_chosen = input("choose the data: temp(erature) rain(fall) sun(shine hours) OR all: ").lower().strip()
+        months_chosen = input("choose the months: jan(uary) feb(ruary) mar(ch) apr(il) may jun(e) jul(y) aug(ust) sep(tember) oct(ober) nov(ember) dec(ember) OR all: ").lower().strip()
 
-        print("done!")
+        cities_display = vaildate_input(cities_chosen, 'city')
+        data_display = vaildate_input(data_chosen, 'data_type')
+        months_display = vaildate_input(months_chosen, 'months')
 
-        valid_cities = temp_data.index.str.lower().tolist()
+        temp_data = read_data('temperature')
+        rainfall_data = read_data('rainfall')
+        sunshine_data = read_data('sunshine')
 
         data_type_map = {
             'temp': 'Temperature',
@@ -115,47 +196,7 @@ def main():
             'sun': sunshine_data
         }
 
-        data_types = ['temp', 'rain', 'sun']
-        
-        months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
-                'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-        months_full = ['January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December']
-
-        cities_chosen = input("choose the cities: ").lower().strip()
-        data_chosen = input("choose the data: temp(erature) rain(fall) sun(shine hours) OR all: ").lower().strip()
-        months_chosen = input("choose the months: jan(uary) feb(ruary) mar(ch) apr(il) may jun(e) jul(y) aug(ust) sep(tember) oct(ober) nov(ember) dec(ember) OR all: ").lower().strip()
-
-        cities_display = []
-        for city in cities_chosen.split():
-            if city not in valid_cities:
-                print(f"{city} is not a legal value (ignored)")
-            else:
-                cities_display.append(city)
-        
-        data_display = []
-        if data_chosen == 'all' or 'all' in data_chosen:
-            data_display = data_types
-        else:
-            for dt in data_chosen.split():
-                if dt not in data_types:
-                    print(f"{dt} is not a legal value (ignored)")
-                else:
-                    data_display.append(dt)
-        
-        months_display = []
-        if months_chosen == 'all' or 'all' in months_chosen:
-            months_display = months_full
-        else:
-            for month in months_chosen.split():
-                if month not in months and month.capitalize() not in months_full:
-                    print(f"{month} is not a legal value (ignored)")
-                else:
-                    if len(month) == 3:
-                        month = convert_month(month)
-                    months_display.append(month)
-        months_display = sort_months(months_display)
-
+        # display data on console
         results = ""
         for city in cities_display:
             print(f"\nData for {city.capitalize()}")
@@ -169,39 +210,15 @@ def main():
                     results += display_data(city, sunshine_data, months_display, "Sunshine hours")
             results += "\n"
 
+        # plot data
         if len(cities_display) > 0 and len(data_display) > 0:
             selected_data_map = {data_type_map[data]: data_map[data] for data in data_display}
             plot_data(cities_display, selected_data_map, months_display)
 
-        while True:
-            save_choice = input("Do you want to save these results in a file (enter 'yes' or 'no')? ").lower().strip() 
-            if save_choice in ['yes', 'no']:
-                if save_choice == 'yes':
-                    file_path = input("Enter the file path: ").strip()
-                    real_path = f'./storage/{file_path}'
-                    if path.exists(real_path):
-                        while True:
-                            update_choice = input("This file exists. Do you want to update this file (enter 'yes' or 'no')? ").lower().strip()
-                            if update_choice in ['yes', 'no']:
-                                if update_choice == 'yes':
-                                    with open(real_path, 'a') as file:
-                                        file.write(results)
-                                        print("File updated successfully.")
-                                else:
-                                    with open(real_path, 'w') as file:
-                                        file.write(results)
-                                        print("File overwritten successfully.")
-                                break
-                            else:
-                                print("Invalid choice. Please enter 'yes' or 'no'.")
-                    else:
-                        with open(real_path, 'w') as file:
-                            file.write(results)
-                            print("File created successfully.")
-                break
-            else:
-                print("Invalid choice. Please enter 'yes' or 'no'.") 
+        # save results
+        save_results(results)
 
+        # continue?
         while True:
             is_continue = input("Do you want to continue (enter 'yes' or 'no')? ").lower().strip()
             if is_continue in ['yes', 'no']:
