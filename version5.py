@@ -168,6 +168,22 @@ def vaildate_input(data_chosen, label):
             return months_display
 
 def main():
+    temp_data = read_data('temperature')
+    rainfall_data = read_data('rainfall')
+    sunshine_data = read_data('sunshine')
+
+    data_type_map = {
+        'temp': 'Temperature',
+        'rain': 'Rainfall',
+        'sun': 'Sunshine hours'
+    }
+
+    data_map = {
+        'temp': temp_data,
+        'rain': rainfall_data,
+        'sun': sunshine_data
+    }
+
     while True:
         print("Welcome to CLIP, the CLImate Plotter")
         print("loading the data... done!", end="\n")
@@ -179,23 +195,7 @@ def main():
         cities_display = vaildate_input(cities_chosen, 'city')
         data_display = vaildate_input(data_chosen, 'data_type')
         months_display = vaildate_input(months_chosen, 'months')
-
-        temp_data = read_data('temperature')
-        rainfall_data = read_data('rainfall')
-        sunshine_data = read_data('sunshine')
-
-        data_type_map = {
-            'temp': 'Temperature',
-            'rain': 'Rainfall',
-            'sun': 'Sunshine hours'
-        }
-
-        data_map = {
-            'temp': temp_data,
-            'rain': rainfall_data,
-            'sun': sunshine_data
-        }
-
+        
         # display data on console
         results = ""
         for city in cities_display:
